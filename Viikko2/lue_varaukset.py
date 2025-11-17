@@ -15,17 +15,19 @@ Puhelin: 0401234567
 Sähköposti: anna.virtanen@example.com
 
 """
-
+import os 
+print("Nykyinen hakemisto:", os.getcwd())
 def main():
     # Määritellään tiedoston nimi suoraan koodissa
     varaukset = "varaukset.txt"
 
     # Avataan tiedosto ja luetaan sisältö
     with open(varaukset, "r", encoding="utf-8") as f:
-        varaus = f.read().strip()
+        varaus = f.read().strip().split('|')
 
     # Tulostetaan varaus konsoliin
-    print(varaus)
+    print(varaus.split('|'))
+    print(f"Varausnumero: {varaus[0]}")
 
     # Kokeile näitä
     #print(varaus.split('|'))
