@@ -1,10 +1,4 @@
-"""
-Ohjelma joka lukee tiedostossa olevat varaustiedot
-ja tulostaa ne konsoliin.
-"""
-
-"""
-Ohjelma joka lukee tiedostossa olevat varaustiedot
+"""Ohjelma joka lukee tiedostossa olevat varaustiedot
 ja tulostaa ne konsoliin.
 """
 
