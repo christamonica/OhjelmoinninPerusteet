@@ -44,7 +44,7 @@ def muunna_varaustiedot(varaus: list) -> list:
     muutettu_varaus.append(float(varaus[7]))
     muutettu_varaus.append(varaus[8].lower() == "true")
     muutettu_varaus.append(varaus[9])
-    muutettu_varaus.append(varaus[10])
+    muutettu_varaus.append(datetime.strptime(varaus[10], "%Y-%m-%d %H:%M:%S"))
     return muutettu_varaus
 
 def hae_varaukset(varaustiedosto: str) -> list:
