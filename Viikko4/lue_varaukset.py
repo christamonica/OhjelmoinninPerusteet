@@ -31,6 +31,7 @@ def muunna_varaustiedot(varaus: list) -> list:
     # Tähän tulee siis varaus oletustietotyypeillä (str)
     # Varauksessa on 11 saraketta -> Lista -> Alkiot 0-10
     # Muuta tietotyypit haluamallasi tavalla -> Seuraavassa esimerkki ensimmäisestä alkioista
+    # return [int(varaus[0])] + varaus[1:] (EN KÄYTÄ TÄTÄ RIVIÄ, TÄMÄ ON VAIN ESIMERKKI)
     muutettu_varaus = []
     # Ensimmäisen alkion = varaus[0] muunnos
     muutettu_varaus.append(int(varaus[0]))
