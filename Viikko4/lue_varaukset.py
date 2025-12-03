@@ -1,110 +1,70 @@
 """
-Ohjelma joka lukee tiedostossa olevat varaustiedot
-ja tulostaa ne konsoliin.
+Ohjelma joka tulostaa tiedostosta luettujen varausten alkiot ja niiden tietotyypit
+
+varausId | nimi | sähköposti | puhelin | varauksenPvm | varauksenKlo | varauksenKesto | hinta | varausVahvistettu | varattuTila | varausLuotu
+------------------------------------------------------------------------
+201 | Muumi Muumilaakso | muumi@valkoinenlaakso.org | 0509876543 | 2025-11-12 | 09:00:00 | 2 | 18.50 | True | Metsätila 1 | 2025-08-12 14:33:20
+int | str | str | str | date | time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+202 | Niiskuneiti Muumilaakso | niisku@muumiglam.fi | 0451122334 | 2025-12-01 | 11:30:00 | 1 | 12.00 | False | Kukkahuone | 2025-09-03 09:12:48
+int | str | str | str | date | time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+203 | Pikku Myy Myrsky | myy@pikkuraivo.net | 0415566778 | 2025-10-22 | 15:45:00 | 3 | 27.90 | True | Punainen Huone | 2025-07-29 18:05:11
+int | str | str | str | date | time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+204 | Nipsu Rahapulainen | nipsu@rahahuolet.me | 0442233445 | 2025-09-18 | 13:00:00 | 4 | 39.95 | False | Varastotila N | 2025-08-01 10:59:02
+int | str | str | str | date | time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+205 | Hemuli Kasvikerääjä | hemuli@kasvikeraily.club | 0463344556 | 2025-11-05 | 08:15:00 | 2 | 19.95 | True | Kasvitutkimuslabra | 2025-10-09 16:41:55
+int | str | str | str | date | time | int | float | bool | str | datetime
+------------------------------------------------------------------------
 """
+from datetime import datetime
 
-import os
+def muunna_varaustiedot(varaus: list) -> list:
+    # Tähän tulee siis varaus oletustietotyypeillä (str)
+    # Varauksessa on 11 saraketta -> Lista -> Alkiot 0-10
+    # Muuta tietotyypit haluamallasi tavalla -> Seuraavassa esimerkki ensimmäisestä alkioista
+    muutettu_varaus = []
+    # Ensimmäisen alkion = varaus[0] muunnos
+    muutettu_varaus.append(int(varaus[0]))
+    # Ja tästä jatkuu
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    muutettu_varaus.append("")
+    return muutettu_varaus
 
-# Vaihdetaan työskentelyhakemisto skriptin omaan kansioon, koska joku ei osannu muuten korjata polkua...
-os.chdir(os.path.dirname(__file__))
-
-# Funktiot kenttien hakemisee
-
-def hae_varausnumero(varaus):
-    return varaus[0]
-
-def hae_varaaja(varaus):
-    return varaus[1]
-
-def hae_paiva(varaus):
-    # Muuta YYYY-MM-DD → DD.MM.YYYY
-    p = varaus[2]
-    if "-" in p:
-        v, kk, pv = p.split("-")
-        return f"{pv}.{kk}.{v}"
-    return p
-
-def hae_aloitusaika(varaus):
-    # Muuta 10:00 → 10.00
-    return varaus[3].replace(":", ".")
-
-def hae_tuntimaara(varaus):
-    return varaus[4]
-
-def hae_tuntihinta(varaus):
-    # Muottaa 19.95 → 19,95
-    return varaus[5].replace(".", ",")
-
-def laske_kokonaishinta(varaus):
-    try:
-        tunnit = float(varaus[4])
-        hinta = float(varaus[5].replace(",", "."))
-        kok = tunnit * hinta
-        return f"{kok:.2f}".replace(".", ",") + " €"
-    except ValueError:
-        return "Virhe: tuntien tai hinnan muoto on väärä"
-
-def hae_maksettu(varaus):
-    arvo = varaus[6].strip().lower()
-    if arvo in ("true", "yes", "kyllä", "1"):
-        return "Kyllä"
-    return "Ei"
-
-def hae_kohde(varaus):
-    return varaus[7]
-
-def hae_puhelin(varaus):
-    return varaus[8]
-
-def hae_sahkoposti(varaus):
-    return varaus[9]
-
-
-# Itse ohjelma 
+def hae_varaukset(varaustiedosto: str) -> list:
+    # HUOM! Tälle funktioille ei tarvitse tehdä mitään!
+    # Jos muutat, kommentoi miksi muutit
+    varaukset = []
+    varaukset.append(["varausId", "nimi", "sähköposti", "puhelin", "varauksenPvm", "varauksenKlo", "varauksenKesto", "hinta", "varausVahvistettu", "varattuTila", "varausLuotu"])
+    with open(varaustiedosto, "r", encoding="utf-8") as f:
+        for varaus in f:
+            varaus = varaus.strip()
+            varaustiedot = varaus.split('|')
+            varaukset.append(muunna_varaustiedot(varaustiedot))
+    return varaukset
 
 def main():
-    tiedosto = "varaukset.txt"
-
-    # Tarkistaa tiedoston olemassaolon
-    if not os.path.exists(tiedosto):
-        print(f"Virhe: tiedostoa '{tiedosto}' ei löydy.")
-        return
-
-    # Yrittää lukee tiedoston
-    try:
-        with open(tiedosto, "r", encoding="utf-8") as f:
-            sisältö = f.read().strip()
-    except Exception as e:
-        print(f"Virhe tiedoston lukemisessa: {e}")
-        return
-
-    # Tarkistaa ettei tiedosto ole tyhjä
-    if not sisältö:
-        print("Virhe: tiedosto on tyhjä.")
-        return
-
-    varaus = sisältö.split('|')
-
-    # Tarkistaa kenttämäärän
-    if len(varaus) != 10:
-        print(f"Virhe: tiedostossa on {len(varaus)} kenttää, mutta pitäisi olla 10.")
-        print("Tarkista että rivin muoto on:")
-        print("123|Anna Virtanen|31.10.2025|10.00|2|19,95|Kyllä|Kokoustila A|0401234567|anna.virtanen@example.com")
-        return
-
-    # Tulostus
-    print(f"Varausnumero: {hae_varausnumero(varaus)}")
-    print(f"Varaaja: {hae_varaaja(varaus)}")
-    print(f"Päivämäärä: {hae_paiva(varaus)}")
-    print(f"Aloitusaika: {hae_aloitusaika(varaus)}")
-    print(f"Tuntimäärä: {hae_tuntimaara(varaus)}")
-    print(f"Tuntihinta: {hae_tuntihinta(varaus)} €")
-    print(f"Kokonaishinta: {laske_kokonaishinta(varaus)}")
-    print(f"Maksettu: {hae_maksettu(varaus)}")
-    print(f"Kohde: {hae_kohde(varaus)}")
-    print(f"Puhelin: {hae_puhelin(varaus)}")
-    print(f"Sähköposti: {hae_sahkoposti(varaus)}")
-
+    # HUOM! seuraaville riveille ei tarvitse tehdä mitään osassa A!
+    # Osa B vaatii muutoksia -> Esim. tulostuksien (print-funktio) muuttamisen.
+    # Kutsutaan funkioita hae_varaukset, joka palauttaa kaikki varaukset oikeilla tietotyypeillä
+    varaukset = hae_varaukset("varaukset.txt")
+    print(" | ".join(varaukset[0]))
+    print("------------------------------------------------------------------------")
+    for varaus in varaukset[1:]:
+        print(" | ".join(str(x) for x in varaus))
+        tietotyypit = [type(x).__name__ for x in varaus]
+        print(" | ".join(tietotyypit))
+        print("------------------------------------------------------------------------")
 
 if __name__ == "__main__":
     main()
