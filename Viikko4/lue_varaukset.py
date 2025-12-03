@@ -35,7 +35,6 @@ def muunna_varaustiedot(varaus: list) -> list:
     muutettu_varaus = []
     # Ensimmäisen alkion = varaus[0] muunnos
     muutettu_varaus.append(int(varaus[0]))
-    # Ja tästä jatkuu
     muutettu_varaus.append(varaus[1])
     muutettu_varaus.append(varaus[2])
     muutettu_varaus.append(varaus[3])
@@ -60,18 +59,33 @@ def hae_varaukset(varaustiedosto: str) -> list:
             varaukset.append(muunna_varaustiedot(varaustiedot))
     return varaukset
 
+def vahvistetut_varaukset(varaukset: list):
+    for varaus in varaukset[1:]:
+        if varaus[8]:  # varausVahvistettu on 8. alkio (indeksi 8)
+    #print("Nimi, Varattu tila, pv.kk.vvvv, klo hh.mm")
+            print(f"- {varaus[1]}")
+    # HUOM! Tälle funktioille ei tarvitse tehdä mitään!
+    # Jos muutat, kommentoi miksi muutit
+    vahvistetut = []
+    for varaus in varaukset[1:]:
+        if varaus[8]:  # varausVahvistettu on 8. alkio (indeksi 8)
+            vahvistetut.append(varaus)
+    return vahvistetut
+
 def main():
     # HUOM! seuraaville riveille ei tarvitse tehdä mitään osassa A!
     # Osa B vaatii muutoksia -> Esim. tulostuksien (print-funktio) muuttamisen.
     # Kutsutaan funkioita hae_varaukset, joka palauttaa kaikki varaukset oikeilla tietotyypeillä
     varaukset = hae_varaukset("varaukset.txt")
-    print(" | ".join(varaukset[0]))
-    print("------------------------------------------------------------------------")
-    for varaus in varaukset[1:]:
-        print(" | ".join(str(x) for x in varaus))
-        tietotyypit = [type(x).__name__ for x in varaus]
-        print(" | ".join(tietotyypit))
-        print("------------------------------------------------------------------------")
+    print("1 Vahvistetut varaukset:")
+    vahvistetut_varaukset(varaukset)
+    #print(" | ".join(varaukset[0]))
+    #print("------------------------------------------------------------------------")
+    #for varaus in varaukset[1:]:
+    #    print(" | ".join(str(x) for x in varaus))
+    #    tietotyypit = [type(x).__name__ for x in varaus]
+    #    print(" | ".join(tietotyypit))
+    #    print("------------------------------------------------------------------------")
 
 if __name__ == "__main__":
     main()
