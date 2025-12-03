@@ -21,7 +21,13 @@ int | str | str | str | date | time | int | float | bool | str | datetime
 """
 from datetime import datetime
 
+import os
+
+# Vaihdetaan työskentelyhakemisto skriptin omaan kansioon, koska joku ei osannu muuten korjata polkua...
+os.chdir(os.path.dirname(__file__))
+
 def muunna_varaustiedot(varaus: list) -> list:
+    # print(varaus)
     # Tähän tulee siis varaus oletustietotyypeillä (str)
     # Varauksessa on 11 saraketta -> Lista -> Alkiot 0-10
     # Muuta tietotyypit haluamallasi tavalla -> Seuraavassa esimerkki ensimmäisestä alkioista
@@ -29,16 +35,16 @@ def muunna_varaustiedot(varaus: list) -> list:
     # Ensimmäisen alkion = varaus[0] muunnos
     muutettu_varaus.append(int(varaus[0]))
     # Ja tästä jatkuu
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
-    muutettu_varaus.append("")
+    muutettu_varaus.append(varaus[1])
+    muutettu_varaus.append(varaus[2])
+    muutettu_varaus.append(varaus[3])
+    muutettu_varaus.append(varaus[4])
+    muutettu_varaus.append(varaus[5])
+    muutettu_varaus.append(int(varaus[6]))
+    muutettu_varaus.append(float(varaus[7]))
+    muutettu_varaus.append(varaus[8])
+    muutettu_varaus.append(varaus[9])
+    muutettu_varaus.append(varaus[10])
     return muutettu_varaus
 
 def hae_varaukset(varaustiedosto: str) -> list:
