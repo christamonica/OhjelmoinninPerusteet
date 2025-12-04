@@ -69,8 +69,8 @@ def vahvistetut_varaukset(varaukset: list):
 
 def pitkat_varaukset(varaukset):
     for varaus in varaukset[1:]:
-        if varaus[6] >= 3:
-            print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime('%d.%m.%Y')}, klo {varaus[5].strftime('%H.%M')}, kesto {varaus[6]} tuntia")
+        if varaus[6] >= 3: #en tiä miks tää toimii näinkin mutta toimii, onks mitään ideaa miks?
+            print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime('%d.%m.%Y')}, klo {varaus[5].strftime('%H.%M')}, kesto {varaus[6]} tuntia, {varaus[9]}")
     
     print()        
 
