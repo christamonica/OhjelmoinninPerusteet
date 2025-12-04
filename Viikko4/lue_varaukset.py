@@ -72,27 +72,45 @@ def pitkat_varaukset(varaukset):
         if varaus[6] >= 3: #en tiä miks tää toimii näinkin mutta toimii, onks mitään ideaa miks?
             print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime('%d.%m.%Y')}, klo {varaus[5].strftime('%H.%M')}, kesto {varaus[6]} tuntia, {varaus[9]}")
     
-    print()        
+    print()      
+
+def varausten_tila(varaukset):
+    for varaus in varaukset[1:]:
+        if varaus[8]:
+            print(f"{varaus[1]} → Vahvistettu")
+        else:
+            print(f"{varaus[1]} → EI vahvistettu")
+
+    print()
+
+def yhteenveto_varauksista(varaukset: list):
+    vahvistetut_varaukset = 0
+    vahvistamattomat_varaukset = 0
+    for varaus in varaukset[1:]:
+        if varaus[8]:
+            vahvistetut_varaukset   += 1
+        else:
+            vahvistamattomat_varaukset += 1
+
+    print(f"- Vahvistettuja varauksia: {vahvistetut_varaukset}")
+    print(f"- Vahvistamattomia varauksia: {vahvistamattomat_varaukset}")
+    print(f"- Yhteensä varauksia: {vahvistetut_varaukset + vahvistamattomat_varaukset}")
 
 def main():
-    # HUOM! seuraaville riveille ei tarvitse tehdä mitään osassa A!
-    # Osa B vaatii muutoksia -> Esim. tulostuksien (print-funktio) muuttamisen.
+
     # Kutsutaan funkioita hae_varaukset, joka palauttaa kaikki varaukset oikeilla tietotyypeillä
     varaukset = hae_varaukset("varaukset.txt")
     print("1) Vahvistetut varaukset:")
     vahvistetut_varaukset(varaukset)
     print("2) Pitkät varaukset (yli 3h):")
     pitkat_varaukset(varaukset)
+    print("3) Varausten vahvistustilanne:") #halusin nimetä tämän näin koska kuulosti paremmalta
+    varausten_tila(varaukset)
+    print("4) Yhteenveto varauksista:")
+    yhteenveto_varauksista(varaukset)
+    print("5) Vahvistettujen varausten kokonaistulot:")
+    varausten_kokonaistulo(varaukset)
 
-
-
-    #print(" | ".join(varaukset[0]))
-    #print("------------------------------------------------------------------------")
-    #for varaus in varaukset[1:]:
-    #    print(" | ".join(str(x) for x in varaus))
-    #    tietotyypit = [type(x).__name__ for x in varaus]
-    #    print(" | ".join(tietotyypit))
-    #    print("------------------------------------------------------------------------")
 
 if __name__ == "__main__":
     main()
