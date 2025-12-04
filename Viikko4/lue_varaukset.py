@@ -61,16 +61,11 @@ def hae_varaukset(varaustiedosto: str) -> list:
 
 def vahvistetut_varaukset(varaukset: list):
     for varaus in varaukset[1:]:
-        if varaus[8]:  # varausVahvistettu on 8. alkio (indeksi 8)
+        if varaus[8]: 
     #print("Nimi, Varattu tila, pv.kk.vvvv, klo hh.mm")
-            print(f"- {varaus[1]}")
-    # HUOM! Tälle funktioille ei tarvitse tehdä mitään!
-    # Jos muutat, kommentoi miksi muutit
-    vahvistetut = []
-    for varaus in varaukset[1:]:
-        if varaus[8]:  # varausVahvistettu on 8. alkio (indeksi 8)
-            vahvistetut.append(varaus)
-    return vahvistetut
+            print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime("%d.%m.%Y")}, {varaus[5].strftime("%H.%M")}")
+  
+    print()
 
 def main():
     # HUOM! seuraaville riveille ei tarvitse tehdä mitään osassa A!
