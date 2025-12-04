@@ -80,7 +80,8 @@ def yhteenveto_varauksista(varaukset: list):
 def varausten_kokonaistulo(varaukset: list):
     kokonaistulot = 0
     for varaus in varaukset[1:]:
-            kokonaistulot += varaus[7]
+        if varaus[8]: #en saanu muuta ku 160,60€?!?!??! ja painin tän kaa pitkää ja jatkoin kattomista ja kappas, sama oli työpajassa ":D"
+            kokonaistulot += varaus[6]*varaus[7]
 
     print("Vahvistettujen varausten kokonaistulot:", f"{kokonaistulot:.2f}".replace('.', ','), "€")
     print()
