@@ -61,19 +61,31 @@ def hae_varaukset(varaustiedosto: str) -> list:
 
 def vahvistetut_varaukset(varaukset: list):
     for varaus in varaukset[1:]:
-        if varaus[8]:  # varausVahvistettu on totuusarvo kohdassa 8        
+        if varaus[8]:  # en tiä miks tää suostuu tulostaa tälläki (katoin 4B:n työpajaa) mutta ok      
     #print("Nimi, Varattu tila, pv.kk.vvvv, klo hh.mm")
             print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime("%d.%m.%Y")}, klo {varaus[5].strftime("%H.%M")}")
   
     print()
+
+def pitkat_varaukset(varaukset):
+    for varaus in varaukset[1:]:
+        if varaus[6] >= 3:
+            print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime('%d.%m.%Y')}, klo {varaus[5].strftime('%H.%M')}, kesto {varaus[6]} tuntia")
+    
+    print()        
 
 def main():
     # HUOM! seuraaville riveille ei tarvitse tehdä mitään osassa A!
     # Osa B vaatii muutoksia -> Esim. tulostuksien (print-funktio) muuttamisen.
     # Kutsutaan funkioita hae_varaukset, joka palauttaa kaikki varaukset oikeilla tietotyypeillä
     varaukset = hae_varaukset("varaukset.txt")
-    print("1 Vahvistetut varaukset:")
+    print("1) Vahvistetut varaukset:")
     vahvistetut_varaukset(varaukset)
+    print("2) Pitkät varaukset (yli 3h):")
+    pitkat_varaukset(varaukset)
+
+
+
     #print(" | ".join(varaukset[0]))
     #print("------------------------------------------------------------------------")
     #for varaus in varaukset[1:]:
