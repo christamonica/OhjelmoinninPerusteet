@@ -63,7 +63,7 @@ def vahvistetut_varaukset(varaukset: list):
     for varaus in varaukset[1:]:
         if varaus[8]: 
     #print("Nimi, Varattu tila, pv.kk.vvvv, klo hh.mm")
-            print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime("%d.%m.%Y")}, {varaus[5].strftime("%H.%M")}")
+            print(f"- {varaus[1]}, {varaus[9]}, {varaus[4].strftime("%d.%m.%Y")}, klo {varaus[5].strftime("%H.%M")}")
   
     print()
 
