@@ -1,206 +1,285 @@
 # Copyright (c) 2025 Christa Selin
 # License: MIT
 
-"""
-Vuoden sähkönkulutuksen raportointi
-Interaktiivinen raporttigeneraattori vuoden 2025 tuntidatalle.
-"""
+from datetime import datetime, date, timedelta
 
-from datetime import datetime, date
-from typing import List, Dict, Any
-import csv
-import os
-import sys
+def muunna_tiedot(tietue: list) -> list:
+    """
+    Muuttaa jokaisen annetun tietorivin tietotyypit oikeiksi
 
-# Vaihdetaan työskentelyhakemisto skriptin omaan kansioon
-os.chdir(os.path.dirname(__file__))
+    Parametrit:
+     tietue: Sisältää 4 kenttää, joista ensimmäinen date -> loput float
 
-
-# Päivämäärän ja lukujen muotoilufunktiot
-
-def muotoile_pvm(pvm: date) -> str:
-    return f"{pvm.day}.{pvm.month}.{pvm.year}"
-
-
-def muotoile_luku(arvo: float) -> str:
-    return f"{arvo:.2f}".replace(".", ",")
+    Palautus:
+     Listan, jossa muutetut tietotyypit
+    """
+    return [
+        datetime.fromisoformat(tietue[0]),
+        float(tietue[1].replace(",", ".")),
+        float(tietue[2].replace(",", ".")),
+        float(tietue[3].replace(",", ".")),
+    ]
 
 
-# Datakäsittely
+def lue_data(tiedoston_nimi: str) -> list:
+    """
+    Lukee CSV-tiedoston ja palauttaa rivit sopivassa rakenteessa ja tietotyypeissä.
 
-def lue_data(tiedoston_nimi: str) -> List[Dict[str, Any]]:
-    """Lukee CSV-tiedoston ja palauttaa mittausrivit listana sanakirjoja."""
-    if not os.path.exists(tiedoston_nimi):
-        print(f"Virhe: Tiedostoa '{tiedoston_nimi}' ei löydy!")
-        sys.exit(1)
+    Kutsuu funktiota muunna_tiedot (lst):
+     funktio palauttaa listan -> Tietotyypit muutettu
 
-    data: List[Dict[str, Any]] = []
-    with open(tiedoston_nimi, "r", encoding="utf-8") as tiedosto:
-        lukija = csv.DictReader(tiedosto, delimiter=",")
-        for rivi in lukija:
+    Parametrit:
+     tiedoston_nimi (str): ottaa vastaan tiedoston, jossa kentät jaettu merkillä ;
+
+    Palautus:
+     tietokanta (lst): palauttaa tietokannan, jossa tietotyypit on muutettu
+    """
+    tietokanta = []
+    with open(tiedoston_nimi, "r", encoding="utf-8") as f:
+        next(f)  # Otetaan kenttien esittelytiedot pois
+        for tietue in f:
+            tietue = tietue.split(";")
+            tietokanta.append(muunna_tiedot(tietue))
+
+    return tietokanta
+
+
+def raportti_tiedostoon(raportti: str):
+    """
+    Kirjoittaa annetun sisällön tiedostoon
+
+    Parametrit:
+     raportti (str): raporttiteksti
+    """
+    with open("raportti.txt", "w", encoding="utf-8") as f:
+        f.write(raportti)
+
+
+def raportti_aikavali(
+    alku: datetime.date, loppu: datetime.date, tietokanta: list
+) -> str:
+    """
+    Raporttiin tulostetaan aikaväliltä:
+    * Alku- ja loppupäivä (pv.kk.vvvv-pv.kk.vvvv)
+    * Aikavälin kokonaiskulutus (kWh, 2 desimaalia, pilkku desimaalina)
+    * Aikavälin kokonaistuotanto (kWh, 2 desimaalia, pilkku desimaalina)
+    * Aikavälin keskilämpötila (esim. kaikkien tuntien lämpötilojen keskiarvo)
+
+    Parametrit:
+     raportti (str): raporttiteksti
+    """
+    raportti = "-----------------------------------------------------\n"
+    raportti += f"Raportti väliltä {alku.day}.{alku.month}.{alku.year}-"
+    raportti += f"{loppu.day}.{loppu.month}.{loppu.year}\n"
+    kulutus = 0
+    tuotanto = 0
+    lampotila = 0
+
+
+    for paiva in tietokanta:
+        if alku <= paiva[0].date() <= loppu:
+            kulutus += paiva[1]
+            tuotanto += paiva[2]
+            lampotila += paiva[3]
+
+    raportti += "- Kokonaiskulutus: " + f"{kulutus:.2f}".replace(".", ",") + " kWh\n"
+    raportti += "- Kokonaistuotanto: " + f"{tuotanto:.2f}".replace(".", ",") + " kWh\n"
+    raportti += (
+        "- Keskilämpötila: "
+        + f"{(lampotila/((loppu - alku).days*24)):.2f}".replace(".", ",")
+        + " °C\n"
+    )
+    raportti += "-----------------------------------------------------\n"
+    return raportti
+
+def raportti_kk(kuukausi: int, tietokanta: list) -> str:
+    """
+    Raporttiin tulostetaan:
+    * Kuukausi
+    * Kuukauden kokonaiskulutus (kWh)
+    * Kuukauden kokonaistuotanto (kWh)
+    * Kuukauden keskimääräinen vuorokauden lämpötila
+
+    Parametrit:
+     raportti (str): raporttiteksti
+    """
+    kuukaudet = ["Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kesäkuu", "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"]
+    raportti = "-----------------------------------------------------\n"
+    raportti += f"Raportti kuulta: {kuukaudet[kuukausi-1]} \n"
+    kulutus = 0
+    tuotanto = 0
+    lampotila = 0
+    paivien_lkm = 0
+
+    for paiva in tietokanta:
+        if paiva[0].date().month == kuukausi:
+            kulutus += paiva[1]
+            tuotanto += paiva[2]
+            lampotila += paiva[3]
+            paivien_lkm += 1
+
+    raportti += "- Kokonaiskulutus: " + f"{kulutus:.2f}".replace(".", ",") + " kWh\n"
+    raportti += "- Kokonaistuotanto: " + f"{tuotanto:.2f}".replace(".", ",") + " kWh\n"
+
+
+    raportti += (
+        "- Keskilämpötila: "
+        + f"{(lampotila/(paivien_lkm*24)):.2f}".replace(".", ",")
+        + " °C\n"
+    )
+    raportti += "-----------------------------------------------------\n"
+    return raportti
+
+def raportti_vuosi(tietokanta: list) -> str:
+    """
+    Raporttiin tulostetaan:
+    * Kuukausi
+    * Kuukauden kokonaiskulutus (kWh)
+    * Kuukauden kokonaistuotanto (kWh)
+    * Kuukauden keskimääräinen vuorokauden lämpötila
+
+    Parametrit:
+     raportti (str): raporttiteksti
+    """
+    raportti = "-----------------------------------------------------\n"
+    raportti += f"Raportti vuodelta: {tietokanta[0][0].date().year} \n"
+    kulutus = 0
+    tuotanto = 0
+    lampotila = 0
+    paivien_lkm = 0
+
+    for paiva in tietokanta:
+        kulutus += paiva[1]
+        tuotanto += paiva[2]
+        lampotila += paiva[3]
+        paivien_lkm += 1
+
+    raportti += "- Kokonaiskulutus: " + f"{kulutus:.2f}".replace(".", ",") + " kWh\n"
+    raportti += "- Kokonaistuotanto: " + f"{tuotanto:.2f}".replace(".", ",") + " kWh\n"
+
+
+    raportti += (
+        "- Keskilämpötila: "
+        + f"{(lampotila/(paivien_lkm*24)):.2f}".replace(".", ",")
+        + " °C\n"
+    )
+    raportti += "-----------------------------------------------------\n"
+    return raportti
+
+def valikot(paavalikko: bool, alavalikko: bool) -> list:
+    """
+    Generoi valikot ja palauttaa valinnat listana
+
+    Parametrit:
+     paavalikko (bool): käynnistetäänkö päävalikko
+     alavalikko (bool): käynnistetäänkö alavalikko
+
+    Palautus:
+     valikon_valinnat (str): Valikon valinta yhdistettyinä arvoihin
+    """
+
+    while True and paavalikko:
+        print("-----------------------------------------------------")
+        print("Valitse raporttityyppi:")
+        print("1) Päiväkohtainen yhteenveto aikaväliltä")
+        print("2) Kuukausikohtainen yhteenveto yhdelle kuukaudelle")
+        print("3) Vuoden 2025 kokonaisyhteenveto")
+        print("4) Lopeta ohjelma")
+        print("-----------------------------------------------------")
+        try:
+            valinta = int(input("Anna valinta (numero 1-4): "))
+            if not (1 <= valinta <= 4):
+                raise ValueError
+        except:
+            print("Valinta ei ole hyväksytty. Anna numero välillä 1-4.")
+            continue
+
+        if valinta == 1:
             try:
-                aika = datetime.fromisoformat(rivi["aika"])
-                data.append({
-                    "aika": aika,
-                    "paiva": aika.date(),
-                    "kulutus": float(rivi["kulutus"]),
-                    "tuotanto": float(rivi["tuotanto"]),
-                    "lampotila": float(rivi["vuorokauden keskilämpötila"])
-                })
-            except (KeyError, ValueError):
-                # Ohitetaan rivit, jotka eivät ole oikein muodossa
+                alku = input("Anna alkupäivä (pv.kk.vvvv): ").split(".")
+                loppu = input("Anna loppupäivä (pv.kk.vvvv): ").split(".")
+                valinnat = [
+                    0,
+                    1,
+                    date(int(alku[2]), int(alku[1]), int(alku[0])),
+                    date(int(loppu[2]), int(loppu[1]), int(loppu[0])),
+                ]
+                break
+            except:
+                print(
+                    "Valinta ei ole hyväksytty. Anna päivät muodossa pv.kk.vvvv. Palataan alkuun."
+                )
                 continue
 
-    if not data:
-        print(f"Virhe: Tiedosto '{tiedoston_nimi}' ei sisällä yhtään kelvollista dataa!")
-        sys.exit(1)
+        elif valinta == 2:
+            try:
+                kuukausi = int(input("Anna kuukauden numero (1–12): "))
+                valinnat = [0, 2, kuukausi]
+                break
+            except:
+                print(
+                    "Valinta ei ole hyväksytty. Anna numero välillä 1-12. Palataan alkuun."
+                )
+                continue
 
-    return data
-
-
-# Valikot
-
-def nayta_paavalikko() -> str:
-    print("\nValitse raporttityyppi:")
-    print("1) Päiväkohtainen yhteenveto aikaväliltä")
-    print("2) Kuukausikohtainen yhteenveto")
-    print("3) Vuoden 2025 kokonaisyhteenveto")
-    print("4) Lopeta ohjelma")
-    return input("Valintasi: ")
-
-
-def nayta_jatkotoimet() -> str:
-    print("\nMitä haluat tehdä seuraavaksi?")
-    print("1) Kirjoita raportti tiedostoon raportti.txt")
-    print("2) Luo uusi raportti")
-    print("3) Lopeta")
-    return input("Valintasi: ")
-
-
-# Raportit (päivä, kuukausi, vuosi)
-
-def luo_paivaraportti(data: List[Dict[str, Any]]) -> List[str]:
-    alku_str = input("Anna alkupäivä (pv.kk.vvvv): ")
-    loppu_str = input("Anna loppupäivä (pv.kk.vvvv): ")
-
-    alku = datetime.strptime(alku_str, "%d.%m.%Y").date()
-    loppu = datetime.strptime(loppu_str, "%d.%m.%Y").date()
-
-    rivit = [
-        "PÄIVÄRAPORTTI",
-        f"Aikaväli: {muotoile_pvm(alku)}–{muotoile_pvm(loppu)}",
-        ""
-    ]
-
-    valitut = [r for r in data if alku <= r["paiva"] <= loppu]
-    if not valitut:
-        rivit.append("Ei dataa valitulta aikaväliltä")
-        return rivit
-
-    kokonaiskulutus = sum(r["kulutus"] for r in valitut)
-    kokonaistuotanto = sum(r["tuotanto"] for r in valitut)
-    keskilampo = sum(r["lampotila"] for r in valitut) / len(valitut)
-
-    rivit.append(f"Kokonaiskulutus: {muotoile_luku(kokonaiskulutus)} kWh")
-    rivit.append(f"Kokonaistuotanto: {muotoile_luku(kokonaistuotanto)} kWh")
-    rivit.append(f"Nettokuorma: {muotoile_luku(kokonaiskulutus - kokonaistuotanto)} kWh")
-    rivit.append(f"Keskilämpötila: {muotoile_luku(keskilampo)} °C")
-
-    return rivit
-
-
-def luo_kuukausiraportti(data: List[Dict[str, Any]]) -> List[str]:
-    kk = int(input("Anna kuukauden numero (1–12): "))
-
-    rivit = [
-        "KUUKAUSIRAPORTTI",
-        f"Kuukausi: {kk}.2025",
-        ""
-    ]
-
-    valitut = [r for r in data if r["paiva"].month == kk]
-    if not valitut:
-        rivit.append("Ei dataa valitulta kuukaudelta.")
-        return rivit
-
-    kokonaiskulutus = sum(r["kulutus"] for r in valitut)
-    kokonaistuotanto = sum(r["tuotanto"] for r in valitut)
-    keskilampo = sum(r["lampotila"] for r in valitut) / len(valitut)
-
-    rivit.append(f"Kokonaiskulutus: {muotoile_luku(kokonaiskulutus)} kWh")
-    rivit.append(f"Kokonaistuotanto: {muotoile_luku(kokonaistuotanto)} kWh")
-    rivit.append(f"Nettokuorma: {muotoile_luku(kokonaiskulutus - kokonaistuotanto)} kWh")
-    rivit.append(f"Keskilämpötila: {muotoile_luku(keskilampo)} °C")
-
-    return rivit
-
-
-def luo_vuosiraportti(data: List[Dict[str, Any]]) -> List[str]:
-    rivit = ["VUOSIRAPORTTI 2025", ""]
-    valitut = [r for r in data if r["paiva"].year == 2025]
-
-    if not valitut:
-        rivit.append("Ei dataa vuodelta 2025.")
-        return rivit
-
-    kokonaiskulutus = sum(r["kulutus"] for r in valitut)
-    kokonaistuotanto = sum(r["tuotanto"] for r in valitut)
-    keskilampo = sum(r["lampotila"] for r in valitut) / len(valitut)
-
-    rivit.append(f"Kokonaiskulutus: {muotoile_luku(kokonaiskulutus)} kWh")
-    rivit.append(f"Kokonaistuotanto: {muotoile_luku(kokonaistuotanto)} kWh")
-    rivit.append(f"Nettokuorma: {muotoile_luku(kokonaiskulutus - kokonaistuotanto)} kWh")
-    rivit.append(f"Keskilämpötila: {muotoile_luku(keskilampo)} °C")
-
-    return rivit
-
-
-# Tulostus ja tiedostoon kirjoitus
-
-def tulosta_raportti_konsoliin(rivit: List[str]) -> None:
-    print("\n" + "=" * 40)
-    for rivi in rivit:
-        print(rivi)
-    print("=" * 40)
-
-
-def kirjoita_raportti_tiedostoon(rivit: List[str]) -> None:
-    with open("raportti.txt", "w", encoding="utf-8") as tiedosto:
-        for rivi in rivit:
-            tiedosto.write(rivi + "\n")
-
-
-# Ohjelman pääfunktio
-
-def main() -> None:
-    data = lue_data("vuosi2025.csv")  # Tarkistaa olemassaolon ja tyhjyden heti
-
-    while True:
-        valinta = nayta_paavalikko()
-
-        if valinta == "1":
-            raportti = luo_paivaraportti(data)
-        elif valinta == "2":
-            raportti = luo_kuukausiraportti(data)
-        elif valinta == "3":
-            raportti = luo_vuosiraportti(data)
-        elif valinta == "4":
-            print("Ohjelma lopetetaan.")
+        elif valinta == 3:
+            valinnat = [0, 3]
+            break
+        elif valinta == 4:
+            valinnat = [0, 4]
             break
         else:
-            print("Virheellinen valinta.")
             continue
 
-        tulosta_raportti_konsoliin(raportti)
-
-        jatko = nayta_jatkotoimet()
-        if jatko == "1":
-            kirjoita_raportti_tiedostoon(raportti)
-            print("Raportti kirjoitettu tiedostoon raportti.txt")
-        elif jatko == "2":
+    while True and alavalikko:
+        print("-----------------------------------------------------")
+        print("Mitä haluat tehdä seuraavaksi?")
+        print("1) Kirjoita raportti tiedostoon raportti.txt")
+        print("2) Luo uusi raportti")
+        print("3) Lopeta")
+        print("-----------------------------------------------------")
+        try:
+            valinta = int(input("Anna valinta (numero 1-3): "))
+            if not (1 <= valinta <= 3):
+                raise ValueError
+        except:
+            print("Valinta ei ole hyväksytty. Anna numero välillä 1-3.")
             continue
-        elif jatko == "3":
-            print("Ohjelma lopetetaan.")
+
+        valinnat = [1, valinta]
+        break
+
+    return valinnat
+
+
+def main():
+    """
+    Ohjelman pääfunktio: kysyys käyttäjältä inputteja ja tulostaa/vie tiedostoon raportteja
+    """
+    # Luetaan data tiedostosta
+    kulutusTuotanto2025 = lue_data("2025.csv")
+
+    while True:
+        paavalikko = valikot(True, False)
+        if paavalikko[1] == 1:
+            raportti = raportti_aikavali(paavalikko[2], paavalikko[3], kulutusTuotanto2025)
+            print(raportti)
+        elif paavalikko[1] == 2:
+            raportti = raportti_kk(paavalikko[2], kulutusTuotanto2025)
+            print(raportti)
+        elif paavalikko[1] == 3:
+            raportti = raportti_vuosi(kulutusTuotanto2025)
+            print(raportti)
+        elif paavalikko[1] == 4:
+            break
+
+        alavalikko = valikot(False, True)
+        if alavalikko[1] == 1:
+            raportti_tiedostoon(raportti)
+            continue
+        elif alavalikko[1] == 2:
+            continue
+        elif alavalikko[1] == 3:
             break
 
 
