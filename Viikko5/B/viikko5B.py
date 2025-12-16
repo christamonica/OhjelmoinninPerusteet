@@ -97,3 +97,24 @@ def tallenna_raportti(t: str, tiedosto: str = "yhteenveto.txt") -> None:
     """
     with open(tiedosto, "w", encoding="utf-8") as f:
         f.write(t)
+
+# Itse ohjelma
+
+def main() -> None:
+    """
+    Lukee kolme viikon tiedostoa ja kirjoittaa yhteenvedon tiedostoon yhteenveto.txt.
+    """
+    viikot = [(41, "viikko41.csv"), (42, "viikko42.csv"), (43, "viikko43.csv")]
+    kokonaisraportti = ""
+
+    for numero, tiedosto in viikot:
+        data = lue_data(tiedosto)
+        kokonaisraportti += muodosta_raportti(data, numero)
+
+    tallenna_raportti(kokonaisraportti)
+    print("Yhteenvetoraportti kirjoitettu tiedostoon 'yhteenveto.txt'.")
+
+# Suoritus
+
+if __name__ == "__main__":
+    main()
