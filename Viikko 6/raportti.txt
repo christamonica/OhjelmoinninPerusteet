@@ -1,6 +1,6 @@
 ---------------------------------------------------------
-Vuosiyhteenveto 2025
-- Kokonaiskulutus: 7396,84 kWh
-- Kokonaistuotanto: 2922,38 kWh
-- Keskilämpötila: 7,83 °C
+Kuukausiyhteenveto: Joulukuu
+- Kokonaiskulutus: 37,12 kWh
+- Kokonaistuotanto: 0,00 kWh
+- Keskilämpötila: 3,50 °C
 ---------------------------------------------------------
