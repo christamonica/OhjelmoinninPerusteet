@@ -15,10 +15,13 @@ def muunna_tiedot(rivi: list) -> list:
     Muuntaa CSV-tiedon oikeaan tietotyyppiin.
     """
     return [
-        datetime.fromisoformat(rivi[0]),            # aika datetime-tyyppinä
-        float(rivi[1].replace(",", ".")) / 1000,   # vaihe 1 kulutus Wh → kWh
-        float(rivi[2].replace(",", ".")) / 1000,   # vaihe 2 kulutus
-        float(rivi[3].replace(",", ".")) / 1000    # vaihe 3 kulutus
+        datetime.fromisoformat(rivi[0]),
+        float(rivi[1].replace(",", ".")) / 1000,  # kulutus v1
+        float(rivi[2].replace(",", ".")) / 1000,  # kulutus v2
+        float(rivi[3].replace(",", ".")) / 1000,  # kulutus v3
+        float(rivi[4].replace(",", ".")) / 1000,  # tuotanto v1
+        float(rivi[5].replace(",", ".")) / 1000,  # tuotanto v2
+        float(rivi[6].replace(",", ".")) / 1000   # tuotanto v3
     ]
 
 def lue_data(tiedoston_nimi: str) -> List[list]:
@@ -59,10 +62,15 @@ def tulosta_viikon_summat(data: List[list]) -> None:
         if not paiva_data[paiva_nimi]["pvm"]:
             paiva_data[paiva_nimi]["pvm"] = paiva_obj
 
-        # Kulutus ja tuotanto vaiheittain (yhteensä päivässä)
+        # Kulutus vaiheittain
         paiva_data[paiva_nimi]["kulutus"][0] += rivi[1]
         paiva_data[paiva_nimi]["kulutus"][1] += rivi[2]
         paiva_data[paiva_nimi]["kulutus"][2] += rivi[3]
+
+        # Tuotanto vaiheittain
+        paiva_data[paiva_nimi]["tuotanto"][0] += rivi[4]
+        paiva_data[paiva_nimi]["tuotanto"][1] += rivi[5]
+        paiva_data[paiva_nimi]["tuotanto"][2] += rivi[6]
 
     # Tulostus
     print("Viikon 42 sähkönkulutus ja -tuotanto (kWh, vaiheittain)\n")
