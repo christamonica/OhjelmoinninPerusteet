@@ -1,5 +1,9 @@
 # Copyright (c) 2025 Christa Selin
-# MIT License
+# Tämä tiedosto sisältää osia Ville Heikkiniemen videotyöpajoista ja GitHub-esimerkeistä,
+# muokattuna omaan käyttöön.
+# Lähde videotyöpajoihin: Kurssimateriaali / Panopto (tarkempaa tietoa kurssialustalla)
+# Lähde GitHub: https://github.com/vheikkiniemi/OhjelmoinninPerusteet2025S/
+# Lisenssi: MIT License
 
 import os
 from datetime import datetime, date
