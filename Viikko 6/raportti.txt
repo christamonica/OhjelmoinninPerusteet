@@ -1,4 +1,6 @@
-KUUKAUSIRAPORTTI
-Kuukausi: 1.2025
-
-Ei dataa valitulta kuukaudelta.
+---------------------------------------------------------
+Vuosiyhteenveto 2025
+- Kokonaiskulutus: 7396,84 kWh
+- Kokonaistuotanto: 2922,38 kWh
+- Keskilämpötila: 7,83 °C
+---------------------------------------------------------
