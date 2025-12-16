@@ -42,3 +42,58 @@ def lue_data(tiedoston_nimi: str) -> List[list]:
         exit(1)
     return tietokanta
 
+# Raportin generointi
+
+def laske_viikon_summat(data: List[list]) -> dict:
+    """
+    Laskee päiväkohtaiset kulutus- ja tuotantoluvut.
+    Palauttaa sanakirjan: päivä -> {"kulutus":[], "tuotanto":[], "pvm":date}
+    """
+    viikonpaivat = ["maanantai","tiistai","keskiviikko","torstai","perjantai","lauantai","sunnuntai"]
+    paiva_data = {paiva: {"kulutus":[0,0,0], "tuotanto":[0,0,0], "pvm": None} for paiva in viikonpaivat}
+
+    for rivi in data:
+        paiva_obj = rivi[0].date()
+        weekday_idx = paiva_obj.weekday()
+        paiva_nimi = viikonpaivat[weekday_idx]
+
+        if not paiva_data[paiva_nimi]["pvm"]:
+            paiva_data[paiva_nimi]["pvm"] = paiva_obj
+
+        # Kulutus ja tuotanto vaiheittain
+        for i in range(3):
+            paiva_data[paiva_nimi]["kulutus"][i] += rivi[i+1]
+            paiva_data[paiva_nimi]["tuotanto"][i] += rivi[i+4]
+
+    return paiva_data
+
+def muodosta_raportti(data: List[list], viikon_numero: int) -> str:
+    """
+    Muodostaa viikon yhteenvedon merkkijonona.
+    """
+    paiva_data = laske_viikon_summat(data)
+    viikonpaivat = ["maanantai","tiistai","keskiviikko","torstai","perjantai","lauantai","sunnuntai"]
+
+    teksti = f"Viikon {viikon_numero} sähkönkulutus ja -tuotanto (kWh, vaiheittain)\n\n"
+    teksti += f"{'Päivä':<12} {'Pvm':<12} {'Kulutus [kWh]':<25} {'Tuotanto [kWh]':<25}\n"
+    teksti += f"{'':<24} {'v1':>6} {'v2':>6} {'v3':>6} {'v1':>6} {'v2':>6} {'v3':>6}\n"
+    teksti += "-"*70 + "\n"
+
+    for paiva in viikonpaivat:
+        pvm_obj = paiva_data[paiva]["pvm"]
+        if not pvm_obj:
+            continue
+        pvm_str = f"{pvm_obj.day}.{pvm_obj.month}.{pvm_obj.year}"
+        kulutus_str = " ".join(f"{x:.2f}".replace(".", ",") for x in paiva_data[paiva]["kulutus"])
+        tuotanto_str = " ".join(f"{x:.2f}".replace(".", ",") for x in paiva_data[paiva]["tuotanto"])
+        teksti += f"{paiva:<12} {pvm_str:<12} {kulutus_str:<25} {tuotanto_str:<25}\n"
+
+    teksti += "\n"
+    return teksti
+
+def tallenna_raportti(t: str, tiedosto: str = "yhteenveto.txt") -> None:
+    """
+    Tallentaa raportin tiedostoon.
+    """
+    with open(tiedosto, "w", encoding="utf-8") as f:
+        f.write(t)
