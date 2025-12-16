@@ -78,4 +78,16 @@ def tulosta_viikon_summat(data: List[list]) -> None:
         tuotanto_str = " ".join(f"{x:.2f}".replace(".", ",") for x in paiva_data[paiva]["tuotanto"])
         print(f"{paiva:<12} {pvm_str:<12} {kulutus_str:<25} {tuotanto_str:<25}")
 
+# Itse ohjelman pääfunktio
 
+def main() -> None:
+    """
+    Ohjelman pääfunktio: lukee tiedot CSV:stä ja tulostaa viikon yhteenvedon.
+    """
+    data = lue_data("viikko42.csv")
+    tulosta_viikon_summat(data)
+
+# Suoritus
+
+if __name__ == "__main__":
+    main()
